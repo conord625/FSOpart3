@@ -4,7 +4,7 @@ const morgan = require("morgan");
 const cors = require("cors");
 
 app.use(cors());
-
+app.use(express.static("dist"));
 app.use(express.json());
 app.use(morgan("tiny"));
 
@@ -45,7 +45,7 @@ app.get("/info", (request, response) => {
 
 app.get("/api/persons/:id", (request, response) => {
   const id = request.params.id;
-  const person = persons.find((person) => person.id === id);
+  const person = persons.find((person) => person.id == id);
   if (person) {
     response.json(person);
   } else {
@@ -55,7 +55,7 @@ app.get("/api/persons/:id", (request, response) => {
 
 app.delete("/api/persons/:id", (request, response) => {
   const id = request.params.id;
-  persons = persons.filter((person) => person.id !== id);
+  persons = persons.filter((person) => person.id != id);
 
   response.status(204).end();
 });
@@ -73,9 +73,9 @@ app.post("/api/persons", (request, response) => {
     });
   }
   const person = {
+    id: id,
     name: body.name,
     number: body.number,
-    id: id,
   };
 
   persons = persons.concat(person);
