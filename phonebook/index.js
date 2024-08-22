@@ -66,7 +66,7 @@ app.delete("/api/persons/:id", (request, response, next) => {
     .catch((error) => next(error));
 });
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
   const body = request.body;
   Person.find({ name: body.name }).then((result) => {
     if (!body.name || !body.number) {
@@ -84,11 +84,15 @@ app.post("/api/persons", (request, response) => {
         number: body.number,
       });
 
-      person.save().then((result) => {
-        console.log(
-          `added ${person.name} number ${person.number} to phonebook`
-        );
-      });
+      person
+        .save()
+        .then((result) => {
+          console.log(
+            `added ${person.name} number ${person.number} to phonebook`
+          );
+          response.json(person);
+        })
+        .catch((error) => next(error));
     }
   });
 });
@@ -114,9 +118,13 @@ const unknownEndpoint = (request, response) => {
 };
 
 app.use(unknownEndpoint);
+
 const errorHandler = (error, request, response, next) => {
   console.error(error.message);
 
+  if (error.name === "ValidationError") {
+    return response.status(400).json({ error: error.message });
+  }
   next(error);
 };
 
